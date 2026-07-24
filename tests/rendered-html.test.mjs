@@ -45,6 +45,21 @@ test("renders every patient-facing route", async () => {
   }
 });
 
+test("gives key navigation destinations distinct page experiences", async () => {
+  const signatures = new Map([
+    ["/treatments", "START WITH WHAT YOU NEED"],
+    ["/technology", "THE DIGITAL CLINICAL LAB"],
+    ["/gallery", "REAL PATIENT CASE STUDIES"],
+    ["/faq", "PLAN YOUR VISIT"],
+    ["/patient-portal", "YOUR PRIVATE CARE SPACE"],
+  ]);
+  for (const [route, signature] of signatures) {
+    const response = await render(route);
+    const html = await response.text();
+    assert.match(html, new RegExp(signature), route);
+  }
+});
+
 test("includes local SEO, structured data, and social preview metadata", async () => {
   const response = await render("/");
   const html = await response.text();

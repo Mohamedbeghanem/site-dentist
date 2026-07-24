@@ -378,6 +378,12 @@ function Home({ onBook }: { onBook: () => void }) {
 }
 
 function InnerPage({ pageKey, onBook }: { pageKey: Exclude<PageKey, "home">; onBook: () => void }) {
+  if (pageKey === "treatments") return <main className="inner-page route-treatments"><TreatmentsExperience onBook={onBook}/><FinalCta onBook={onBook}/></main>;
+  if (pageKey === "technology") return <main className="inner-page route-technology"><TechnologyExperience onBook={onBook}/><FinalCta onBook={onBook}/></main>;
+  if (pageKey === "gallery") return <main className="inner-page route-gallery"><GalleryExperience onBook={onBook}/><FinalCta onBook={onBook}/></main>;
+  if (pageKey === "faq") return <main className="inner-page route-patient-info"><PatientInfoExperience/></main>;
+  if (pageKey === "patient-portal") return <main className="inner-page route-portal"><PortalExperience/></main>;
+
   const copy = pageCopy[pageKey];
   const emergency = pageKey === "emergency";
   return (
@@ -409,14 +415,8 @@ function renderPageContent(pageKey: Exclude<PageKey, "home">, onBook: () => void
       return <AboutContent/>;
     case "dentists":
       return <><DoctorsSection onBook={onBook} expanded/><ValuesBand/></>;
-    case "treatments":
-      return <section className="services-section section-shell page-section"><TreatmentGrid onBook={onBook}/><CareJourney/></section>;
     case "emergency":
       return <EmergencyContent onBook={onBook}/>;
-    case "gallery":
-      return <><GallerySection expanded/><TestimonialsSection/></>;
-    case "technology":
-      return <><TechnologySection expanded/><ComfortSection/></>;
     case "testimonials":
       return <><TestimonialsSection expanded/><ReviewWall/></>;
     case "pricing":
@@ -425,15 +425,218 @@ function renderPageContent(pageKey: Exclude<PageKey, "home">, onBook: () => void
       return <InsuranceContent/>;
     case "blog":
       return <BlogContent/>;
-    case "faq":
-      return <FaqContent/>;
     case "contact":
       return <ContactContent/>;
     case "book-appointment":
       return <section className="inline-booking section-shell"><BookingFlow inline/></section>;
+    case "treatments":
+    case "gallery":
+    case "technology":
+    case "faq":
     case "patient-portal":
-      return <PortalContent/>;
+      return null;
   }
+}
+
+function RouteBreadcrumb({ label, light = false }: { label: string; light?: boolean }) {
+  return <div className={`route-breadcrumb ${light ? "light" : ""}`}><Link href="/">Home</Link><ChevronRight size={13}/><span>{label}</span></div>;
+}
+
+function TreatmentsExperience({ onBook }: { onBook: () => void }) {
+  const needs = [
+    { label: "Stay healthy", note: "Check-ups, hygiene, prevention", icon: ShieldCheck, matches: [7, 6] },
+    { label: "Fix a problem", note: "Pain, damage, missing teeth", icon: Activity, matches: [3, 4, 0] },
+    { label: "Improve my smile", note: "Whitening, alignment, aesthetics", icon: Sparkles, matches: [2, 1, 4] },
+    { label: "I need help today", note: "Pain, swelling, trauma", icon: Zap, matches: [5, 3] },
+  ];
+  const [selected, setSelected] = useState(0);
+  const matched = needs[selected].matches.map((index) => treatments[index]);
+  return (
+    <>
+      <section className="treatment-finder-hero">
+        <RouteBreadcrumb label="Treatments"/>
+        <div className="section-shell treatment-finder-layout">
+          <div className="treatment-finder-copy">
+            <span className="eyebrow"><i/> START WITH WHAT YOU NEED</span>
+            <h1>You don’t need to know<br/><em>the treatment name.</em></h1>
+            <p>Tell us what you want to change. We’ll connect the symptoms, goals, and right clinical expertise into one clear plan.</p>
+            <button className="button primary large" onClick={onBook}>Talk to a care coordinator <ArrowRight size={17}/></button>
+          </div>
+          <div className="treatment-finder" aria-label="Treatment finder">
+            <small>WHAT BRINGS YOU HERE?</small>
+            <div className="need-options">
+              {needs.map(({ label, note, icon: Icon }, index) => <button className={selected === index ? "active" : ""} onClick={() => setSelected(index)} key={label}><Icon/><span><b>{label}</b><small>{note}</small></span><ChevronRight/></button>)}
+            </div>
+            <div className="finder-results">
+              <span>GOOD PLACES TO START</span>
+              {matched.map((item) => <button key={item.title} onClick={onBook}><b>{item.title}</b><small>{item.time}</small><ArrowRight/></button>)}
+            </div>
+          </div>
+        </div>
+      </section>
+      <TreatmentDirectory onBook={onBook}/>
+      <section className="section-shell"><CareJourney/></section>
+    </>
+  );
+}
+
+function TreatmentDirectory({ onBook }: { onBook: () => void }) {
+  const categories = ["All care", "Prevent", "Restore", "Smile", "Urgent"];
+  const [category, setCategory] = useState("All care");
+  const categoryMap: Record<string, number[]> = {
+    "All care": [0, 1, 2, 3, 4, 5, 6, 7],
+    Prevent: [7, 6],
+    Restore: [0, 3, 4],
+    Smile: [1, 2, 4],
+    Urgent: [5, 3],
+  };
+  return (
+    <section className="treatment-directory section-shell">
+      <div className="directory-intro"><span className="eyebrow"><i/> TREATMENT DIRECTORY</span><h2>Explore care by<br/><em>what matters to you.</em></h2><p>Every plan is personalized after a complete assessment. These pathways help you understand the possibilities.</p></div>
+      <div className="directory-body">
+        <nav aria-label="Treatment categories">{categories.map((item) => <button className={category === item ? "active" : ""} onClick={() => setCategory(item)} key={item}>{item}<span>{categoryMap[item].length}</span></button>)}</nav>
+        <div className="directory-list">
+          {categoryMap[category].map((index) => {
+            const { icon: Icon, title, text, time } = treatments[index];
+            return <article key={title}><span><Icon/></span><div><small>{String(index + 1).padStart(2, "0")} · {time}</small><h3>{title}</h3><p>{text}</p></div><button onClick={onBook} aria-label={`Discuss ${title}`}><ArrowRight/></button></article>;
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TechnologyExperience({ onBook }: { onBook: () => void }) {
+  const [active, setActive] = useState(0);
+  const benefits = [
+    ["No impression trays", "A complete 3D model in under a minute", "See the plan on screen"],
+    ["Lower radiation", "Instant high-resolution imaging", "Earlier, clearer detection"],
+    ["One-visit restoration", "Digital shade and fit control", "No temporary crown"],
+    ["Gentler soft-tissue care", "Less bleeding where appropriate", "More precise healing"],
+    ["A second set of eyes", "Tracks changes over time", "Your dentist makes every decision"],
+  ];
+  const activeTech = technologies[active];
+  const ActiveIcon = activeTech.icon;
+  return (
+    <>
+      <section className="technology-lab-hero">
+        <RouteBreadcrumb label="Technology" light/>
+        <div className="section-shell technology-lab-head">
+          <span className="eyebrow light"><i/> THE DIGITAL CLINICAL LAB</span>
+          <h1>Technology you can<br/><em>actually feel.</em></h1>
+          <p>Not gadgets for show. Five carefully connected systems that make your visit clearer, calmer, and more precise.</p>
+        </div>
+        <div className="section-shell lab-console">
+          <div className="lab-nav">
+            {technologies.map(({ icon: Icon, title }, index) => <button className={active === index ? "active" : ""} onClick={() => setActive(index)} key={title}><span>0{index + 1}</span><Icon/><b>{title}</b></button>)}
+          </div>
+          <div className="lab-stage">
+            <div className="scan-orbit"><span/><span/><span/><ActiveIcon/></div>
+            <small>LIVE SYSTEM · 0{active + 1}</small>
+            <h2>{activeTech.title}</h2>
+            <p>{activeTech.text}</p>
+          </div>
+          <div className="lab-benefits">
+            <small>WHAT CHANGES FOR YOU</small>
+            {benefits[active].map((item) => <p key={item}><Check/>{item}</p>)}
+            <button className="button light" onClick={onBook}>Experience it at your visit <ArrowRight/></button>
+          </div>
+        </div>
+      </section>
+      <section className="technology-outcomes section-shell">
+        <div><strong>60 sec</strong><span>to capture a complete 3D scan</span></div>
+        <div><strong>70%</strong><span>less radiation than conventional imaging</span></div>
+        <div><strong>1 visit</strong><span>for many ceramic restorations</span></div>
+        <div><strong>100%</strong><span>of decisions remain clinician-led</span></div>
+      </section>
+    </>
+  );
+}
+
+function GalleryExperience({ onBook }: { onBook: () => void }) {
+  const cases = [
+    { tag: "ALIGNMENT", title: "A confident smile, without changing its character.", detail: "Invisalign · 9 months", tone: "warm" },
+    { tag: "RESTORATIVE", title: "Function restored with a naturally quiet result.", detail: "Implant + ceramic crown · 4 months", tone: "dark" },
+    { tag: "WHITENING", title: "Brighter, balanced, and still completely natural.", detail: "Enamel-safe whitening · 2 visits", tone: "light" },
+    { tag: "SMILE DESIGN", title: "Small refinements. A beautifully harmonious whole.", detail: "Minimal-prep veneers · 6 weeks", tone: "peach" },
+  ];
+  const [active, setActive] = useState(0);
+  return (
+    <>
+      <section className="gallery-editorial-hero">
+        <RouteBreadcrumb label="Smile gallery"/>
+        <div className="section-shell gallery-editorial-head">
+          <div><span className="eyebrow"><i/> REAL PATIENT CASE STUDIES</span><h1>Every result has<br/><em>a reason behind it.</em></h1></div>
+          <div><p>Explore the decisions, restraint, and clinical planning behind naturally confident smiles. No filters. No one-size-fits-all transformations.</p><span><ShieldCheck/> Shared with patient consent · Individual results vary</span></div>
+        </div>
+        <div className="gallery-feature">
+          <div className="gallery-face before"><span>BEFORE</span><div className="portrait-line"/></div>
+          <div className="gallery-case-note"><small>CASE 01 · ALIGNMENT</small><blockquote>“I wanted to look like myself—just more confident.”</blockquote><span>Invisalign · 9 months · Dr. Amel Rahmani</span><button onClick={onBook}>Plan your smile <ArrowRight/></button></div>
+          <div className="gallery-face after"><span>AFTER</span><div className="portrait-line"/></div>
+        </div>
+      </section>
+      <section className="gallery-case-library section-shell">
+        <div className="case-library-head"><span className="eyebrow"><i/> THE CASE LIBRARY</span><h2>Different goals.<br/><em>Distinctly personal outcomes.</em></h2></div>
+        <div className="case-tabs">{cases.map((item, index) => <button className={active === index ? "active" : ""} onClick={() => setActive(index)} key={item.tag}>0{index + 1} {item.tag}</button>)}</div>
+        <div className={`case-study tone-${cases[active].tone}`}>
+          <div className="case-visual"><span>BEFORE</span><i/><i/><i/><b>AFTER</b></div>
+          <div className="case-copy"><small>CASE {String(active + 1).padStart(2, "0")} · {cases[active].tag}</small><h3>{cases[active].title}</h3><p>{cases[active].detail}</p><ul><li><Check/> Facially driven planning</li><li><Check/> Conservative treatment first</li><li><Check/> Health, comfort, and longevity considered</li></ul><button className="button primary" onClick={onBook}>Discuss a similar goal <ArrowRight/></button></div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function PatientInfoExperience() {
+  const hubs = [
+    { icon: CalendarDays, title: "Your first visit", text: "What happens, what to bring, and how long to allow.", href: "#visit" },
+    { icon: HeartHandshake, title: "Comfort & anxiety", text: "How we make treatment feel calmer and more in your control.", href: "#comfort" },
+    { icon: CreditCard, title: "Fees & insurance", text: "Clear estimates, cover checks, and flexible payment options.", href: "/insurance" },
+    { icon: Zap, title: "Urgent help", text: "What to do now for pain, swelling, trauma, or a broken tooth.", href: "/emergency" },
+  ];
+  return (
+    <>
+      <section className="patient-info-hero">
+        <RouteBreadcrumb label="Patient information"/>
+        <div className="section-shell patient-info-head"><span className="eyebrow"><i/> PLAN YOUR VISIT</span><h1>Come prepared.<br/><em>Leave reassured.</em></h1><p>Practical, plain-language guidance for every stage of your care—without searching through a wall of FAQs.</p></div>
+        <div className="section-shell info-hub-grid">{hubs.map(({ icon: Icon, title, text, href }) => <Link href={href} key={title}><Icon/><span><b>{title}</b><small>{text}</small></span><ArrowRight/></Link>)}</div>
+      </section>
+      <PatientVisitGuide/>
+      <FaqContent/>
+    </>
+  );
+}
+
+function PatientVisitGuide() {
+  return (
+    <section className="visit-guide section-shell" id="visit">
+      <div className="visit-guide-title"><span className="eyebrow"><i/> FIRST VISIT, MADE SIMPLE</span><h2>From booking to<br/><em>your clear next step.</em></h2></div>
+      <div className="visit-timeline">
+        {[
+          ["01", "Before", "Complete your medical history online and bring your ID, medication list, and insurance card."],
+          ["02", "Arrive", "Come 10 minutes early. Our care team will welcome you and answer immediate questions."],
+          ["03", "Understand", "Your clinician listens first, then completes only the diagnostics that are genuinely useful."],
+          ["04", "Decide", "You leave with clear options, written costs, and no pressure to choose on the spot."],
+        ].map(([number, title, text]) => <article key={number}><span>{number}</span><div><h3>{title}</h3><p>{text}</p></div></article>)}
+      </div>
+      <aside id="comfort"><HeartHandshake/><div><small>ANXIOUS ABOUT DENTISTRY?</small><h3>Tell us before you arrive.</h3><p>We can allow more time, agree on a pause signal, explain each step, and discuss suitable comfort or sedation options.</p></div><Link className="button subtle" href="/contact">Share a concern</Link></aside>
+    </section>
+  );
+}
+
+function PortalExperience() {
+  return (
+    <>
+      <section className="portal-entry">
+        <RouteBreadcrumb label="Patient portal" light/>
+        <div className="section-shell portal-entry-head">
+          <div><span className="eyebrow light"><i/> YOUR PRIVATE CARE SPACE</span><h1>Your dental care,<br/><em>organized around you.</em></h1><p>Appointments, treatment plans, documents, and payments—securely accessible whenever you need them.</p></div>
+          <div className="portal-preview" aria-hidden="true"><span><i/><i/><i/></span><div><small>NEXT VISIT</small><b>Invisalign review</b><em>Confirmed · July 28</em></div><div><small>TREATMENT</small><b>3 of 8 milestones</b><i><span style={{ width: "38%" }}/></i></div></div>
+        </div>
+      </section>
+      <PortalContent/>
+    </>
+  );
 }
 
 function TreatmentGrid({ onBook, limit }: { onBook: () => void; limit?: number }) {
