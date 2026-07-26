@@ -292,7 +292,7 @@ function Home({ onBook }: { onBook: () => void }) {
   return (
     <main>
       <section className="home-hero">
-        <div className="hero-image" role="img" aria-label="Dentist welcoming a patient in a modern treatment room"/>
+        <div className="hero-image media-treatment media-treatment-hero" role="img" aria-label="Dentist welcoming a patient in a modern treatment room"/>
         <div className="hero-shade"/>
         <div className="hero-content reveal">
           <span className="eyebrow light"><i/> MODERN DENTISTRY · HUMAN CARE</span>
@@ -351,7 +351,7 @@ function Home({ onBook }: { onBook: () => void }) {
       </section>
 
       <section className="experience-section">
-        <div className="experience-image">
+        <div className="experience-image media-treatment media-treatment-section">
           <div className="equipment-orb"><ScanLine size={22}/><span><b>No uncomfortable impressions</b><small>Precision 3D scanning in under 60 seconds</small></span></div>
         </div>
         <div className="experience-copy">
@@ -398,7 +398,7 @@ function InnerPage({ pageKey, onBook }: { pageKey: Exclude<PageKey, "home">; onB
             {!["book-appointment", "patient-portal"].includes(pageKey) && <Link className="button subtle large" href="/contact">Ask a question</Link>}
           </div>
         </div>
-        <div className={`inner-hero-art art-${pageKey}`}>
+        <div className={`inner-hero-art media-treatment media-treatment-section art-${pageKey}`}>
           <span className="art-card"><Rating compact/><b>{emergency ? "A clinician will speak with you now" : "Trusted by 12,000+ patients"}</b></span>
         </div>
       </section>
@@ -664,7 +664,7 @@ function DoctorsSection({ onBook, expanded = false }: { onBook: () => void; expa
       <div className="doctor-grid">
         {doctors.map((doctor) => (
           <article className="doctor-card" key={doctor.name}>
-            <div className={`doctor-photo ${doctor.crop}`}><span><Star size={13} fill="currentColor"/> 4.9</span></div>
+            <div className={`doctor-photo media-treatment media-treatment-portrait ${doctor.crop}`}><span><Star size={13} fill="currentColor"/> 4.9</span></div>
             <div className="doctor-info">
               <small>{doctor.role}</small><h3>{doctor.name}</h3>
               <p>{doctor.bio}</p>
@@ -712,11 +712,11 @@ function GallerySection({ expanded = false }: { expanded?: boolean }) {
       </div>
       {expanded && <div className="gallery-filters">{filters.map((item) => <button className={filter === item ? "active" : ""} onClick={() => setFilter(item)} key={item}>{item}</button>)}</div>}
       <div className="comparison-card">
-        <div className="smile-before"><span>BEFORE</span><div className="smile-teeth muted">{[1,2,3,4,5,6,7,8].map((n) => <i key={n}/>)}</div></div>
-        <div className="smile-after" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}><span>AFTER</span><div className="smile-teeth">{[1,2,3,4,5,6,7,8].map((n) => <i key={n}/>)}</div></div>
+        <div className="smile-before media-treatment media-treatment-clinical"><span>BEFORE</span></div>
+        <div className="smile-after media-treatment media-treatment-clinical" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}><span>AFTER</span></div>
         <input aria-label="Before and after comparison" type="range" min="8" max="92" value={position} onChange={(event) => setPosition(Number(event.target.value))}/>
         <div className="comparison-handle" style={{ left: `${position}%` }}><ArrowLeft size={14}/><ArrowRight size={14}/></div>
-        <div className="comparison-caption"><small>{filter === "All" ? "WHITENING + ALIGNMENT" : filter.toUpperCase()}</small><b>Confidence, without looking “done”.</b><span>Individual results vary · Patient consent obtained</span></div>
+        <div className="comparison-caption"><small>{filter === "All" ? "WHITENING + ALIGNMENT" : filter.toUpperCase()}</small><b>Confidence, without looking “done”.</b><span>Representative visualization · Individual results vary</span></div>
       </div>
     </section>
   );
@@ -817,7 +817,7 @@ function EmergencyContent({ onBook }: { onBook: () => void }) {
   );
 }
 
-function ComfortSection() {
+export function ComfortSection() {
   return (
     <section className="comfort-section section-shell">
       <div className="comfort-visual"><ScanLine/><span>60 sec</span><small>complete 3D scan</small></div>
@@ -979,7 +979,7 @@ function BookingFlow({ inline = false, onClose }: { inline?: boolean; onClose?: 
         {canGoBack && <button className="booking-back" onClick={() => setStep(step - 1)}><ArrowLeft/> Back</button>}
         {step < 4 && <><small>STEP {step + 1} OF 4</small><h2>{headings[step]}</h2></>}
         {step === 0 && <div className="booking-options">{["New patient consultation", "Emergency appointment", "Hygiene & check-up", "Dental implants", "Invisalign / orthodontics", "Cosmetic dentistry", "Other concern"].map((item) => <button className={treatment === item ? "selected" : ""} onClick={() => setTreatment(item)} key={item}><span>{item === "Emergency appointment" ? <Zap/> : <Stethoscope/>}</span><b>{item}</b>{treatment === item && <CircleCheck/>}</button>)}</div>}
-        {step === 1 && <div className="dentist-options"><button className={dentist === "First available" ? "selected" : ""} onClick={() => setDentist("First available")}><span className="smart-avatar"><Sparkles/></span><span><b>First available</b><small>Fastest appointment across the team</small></span><strong>Recommended</strong></button>{doctors.map((doctor) => <button className={dentist === doctor.name ? "selected" : ""} onClick={() => setDentist(doctor.name)} key={doctor.name}><span className={`mini-doctor ${doctor.crop}`}/><span><b>{doctor.name}</b><small>{doctor.role}</small></span><ChevronRight/></button>)}</div>}
+        {step === 1 && <div className="dentist-options"><button className={dentist === "First available" ? "selected" : ""} onClick={() => setDentist("First available")}><span className="smart-avatar"><Sparkles/></span><span><b>First available</b><small>Fastest appointment across the team</small></span><strong>Recommended</strong></button>{doctors.map((doctor) => <button className={dentist === doctor.name ? "selected" : ""} onClick={() => setDentist(doctor.name)} key={doctor.name}><span className={`mini-doctor media-treatment media-treatment-portrait ${doctor.crop}`}/><span><b>{doctor.name}</b><small>{doctor.role}</small></span><ChevronRight/></button>)}</div>}
         {step === 2 && <div className="date-time"><div className="day-tabs">{days.map((day, index) => <button className={date === index ? "selected" : ""} onClick={() => setDate(index)} key={day}><small>{day.includes(" ") ? day.split(" ")[0] : "JUL"}</small><b>{day.includes(" ") ? day.split(" ")[1] : day}</b></button>)}</div><div className="availability-note"><Sparkles/><span><b>Best availability</b><small>These times match your treatment length and clinician preferences.</small></span></div><div className="time-slots">{slots.map((slot) => <button className={time === slot ? "selected" : ""} onClick={() => setTime(slot)} key={slot}>{slot}{slot === "10:30 AM" && <small>Best match</small>}</button>)}</div></div>}
         {step === 3 && <form className="patient-form" onSubmit={(event) => { event.preventDefault(); setStep(4); }}><div><label>First name<input required placeholder="Sofia"/></label><label>Last name<input required placeholder="Martinez"/></label></div><label>Mobile number<input required type="tel" placeholder="+213 555 0100"/></label><label>Email address<input required type="email" placeholder="sofia@email.com"/></label><label className="booking-check"><input type="checkbox" defaultChecked/><span><b>Send appointment reminders</b><small>Receive confirmation and reminders by SMS, email, and WhatsApp.</small></span></label><label className="booking-check"><input type="checkbox"/><span><b>I’m anxious about dental treatment</b><small>We’ll allow extra time and let your care team know.</small></span></label><button className="button primary booking-submit" type="submit">Confirm appointment <ArrowRight/></button></form>}
         {step === 4 && <div className="booking-confirmation"><span><Check/></span><small>APPOINTMENT CONFIRMED</small><h2>{headings[4]}</h2><p>We sent confirmation by SMS and email. You can reschedule or cancel from the secure link at any time.</p><div><CalendarDays/><span><b>{treatment}</b><small>{days[date]} · {time}</small><small>{dentist}</small></span></div><button className="button primary" onClick={onClose}>Done</button><button className="text-link">Add to Google Calendar <ArrowRight/></button></div>}

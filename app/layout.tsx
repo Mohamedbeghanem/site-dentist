@@ -41,7 +41,7 @@ const dentalSchema = {
   url: "https://lumiere-dental.example",
   telephone: "+2135550100",
   email: "care@lumieredental.com",
-  image: "https://lumiere-dental.example/images/clinic-hero.png",
+  image: "https://lumiere-dental.example/images/clinic-hero-brand.webp",
   priceRange: "$$",
   address: {
     "@type": "PostalAddress",
