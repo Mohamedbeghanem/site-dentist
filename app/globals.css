@@ -18,6 +18,8 @@
   --dark: #1d1b19;
   --dark-2: #292622;
   --green: var(--brand);
+  --whatsapp: #128c5a;
+  --whatsapp-dark: #0d6f45;
   --shadow: 0 24px 70px rgba(6, 28, 53, .12);
   --media-cool-wash: linear-gradient(180deg,rgba(234,240,247,.055),rgba(11,42,74,.035));
   --media-hero-scrim: linear-gradient(90deg,rgba(6,28,53,.96) 0%,rgba(6,28,53,.78) 30%,rgba(11,42,74,.36) 51%,rgba(11,42,74,.11) 70%,rgba(11,42,74,.04) 100%);
@@ -819,8 +821,8 @@ a { color: inherit; }
 .booking-flow.inline { overflow: hidden; border: 1px solid var(--line); border-radius: 19px; box-shadow: var(--shadow); }
 .booking-flow.inline .booking-main { max-height: none; }
 
-.whatsapp-float { position: fixed; z-index: 40; right: 20px; bottom: 20px; display: flex; height: 44px; padding: 0 15px; align-items: center; gap: 8px; border-radius: 23px; background: var(--brand); color: #fff; box-shadow: 0 12px 30px rgba(11,42,74,.28); font-size: 9px; font-weight: 650; text-decoration: none; transition: .25s; }
-.whatsapp-float:hover { transform: translateY(-3px); }
+.whatsapp-float { position: fixed; z-index: 40; right: 20px; bottom: 20px; display: flex; height: 44px; padding: 0 15px; align-items: center; gap: 8px; border-radius: 23px; background: var(--whatsapp); color: #fff; box-shadow: 0 12px 30px rgba(18,140,90,.28); font-size: 9px; font-weight: 650; text-decoration: none; transition: .25s; }
+.whatsapp-float:hover { background: var(--whatsapp-dark); box-shadow: 0 15px 34px rgba(18,140,90,.34); transform: translateY(-3px); }
 .mobile-actions { display: none; }
 
 .site-footer { background: #191817; color: #fff; }
