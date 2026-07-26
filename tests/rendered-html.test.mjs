@@ -82,3 +82,26 @@ test("removes the disposable starter experience", async () => {
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.match(packageJson, /lumiere-dental-atelier/);
 });
+
+test("ships an accessible, viewport-safe mobile navigation system", async () => {
+  const [component, styles, layout] = await Promise.all([
+    readFile(new URL("../app/ClinicSite.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(component, /aria-controls="mobile-site-menu"/);
+  assert.match(component, /aria-expanded=\{menuOpen\}/);
+  assert.match(component, /role="dialog"/);
+  assert.match(component, /aria-modal="true"/);
+  assert.match(component, /event\.key === "Escape"/);
+  assert.match(component, /event\.key !== "Tab"/);
+  assert.match(component, /body\.style\.position = "fixed"/);
+  assert.match(component, /window\.scrollTo/);
+  assert.match(styles, /height:\s*100dvh/);
+  assert.match(styles, /--mobile-dock-space:/);
+  assert.match(styles, /env\(safe-area-inset-bottom/);
+  assert.match(styles, /\.site-chrome\s*\{\s*padding-bottom:\s*var\(--mobile-dock-space\)/);
+  assert.match(styles, /font-size:\s*16px/);
+  assert.match(layout, /viewportFit:\s*"cover"/);
+});

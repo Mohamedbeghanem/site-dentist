@@ -34,7 +34,7 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type PageKey =
   | "home"
@@ -61,6 +61,8 @@ const navItems = [
   ["Smile gallery", "/gallery"],
   ["Patient info", "/faq"],
 ] as const;
+
+const mobileNavItems = [["Home", "/"], ...navItems] as const;
 
 const allLinks = [
   ["Home", "/"],
@@ -254,35 +256,201 @@ function Rating({ compact = false }: { compact?: boolean }) {
 export default function ClinicSite({ pageKey }: { pageKey: PageKey }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const menuTriggerRef = useRef<HTMLButtonElement>(null);
+  const menuDialogRef = useRef<HTMLDivElement>(null);
+  const menuWasOpenRef = useRef(false);
+  const overlayOpen = menuOpen || bookingOpen;
+  const isCurrentPage = (href: string) => href === "/" ? pageKey === "home" : href.slice(1) === pageKey;
+
+  useEffect(() => {
+    if (!overlayOpen) return;
+
+    const root = document.documentElement;
+    const body = document.body;
+    const scrollPosition = window.scrollY;
+    const previousRootOverflow = root.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyPosition = body.style.position;
+    const previousBodyTop = body.style.top;
+    const previousBodyWidth = body.style.width;
+
+    root.classList.add("overlay-open");
+    root.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollPosition}px`;
+    body.style.width = "100%";
+
+    return () => {
+      root.classList.remove("overlay-open");
+      root.style.overflow = previousRootOverflow;
+      body.style.overflow = previousBodyOverflow;
+      body.style.position = previousBodyPosition;
+      body.style.top = previousBodyTop;
+      body.style.width = previousBodyWidth;
+      window.scrollTo({ top: scrollPosition, left: 0, behavior: "auto" });
+    };
+  }, [overlayOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      document.documentElement.classList.remove("mobile-menu-open");
+      if (menuWasOpenRef.current && !bookingOpen) menuTriggerRef.current?.focus();
+      menuWasOpenRef.current = false;
+      return;
+    }
+
+    menuWasOpenRef.current = true;
+    document.documentElement.classList.add("mobile-menu-open");
+    const dialog = menuDialogRef.current;
+    if (!dialog) return;
+
+    const focusableSelector = [
+      "a[href]",
+      "button:not([disabled])",
+      "input:not([disabled])",
+      "select:not([disabled])",
+      "textarea:not([disabled])",
+      "[tabindex]:not([tabindex='-1'])",
+    ].join(",");
+    const closeButton = dialog.querySelector<HTMLElement>("[data-menu-close]");
+    const animationFrame = window.requestAnimationFrame(() => closeButton?.focus());
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setMenuOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(focusableSelector))
+        .filter((element) => !element.hasAttribute("disabled") && element.getAttribute("aria-hidden") !== "true");
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.documentElement.classList.remove("mobile-menu-open");
+    };
+  }, [menuOpen, bookingOpen]);
+
+  useEffect(() => {
+    const desktopQuery = window.matchMedia("(min-width: 1081px)");
+    const closeMenuAtDesktopWidth = (event: MediaQueryListEvent) => {
+      if (event.matches) setMenuOpen(false);
+    };
+    desktopQuery.addEventListener("change", closeMenuAtDesktopWidth);
+    return () => desktopQuery.removeEventListener("change", closeMenuAtDesktopWidth);
+  }, []);
+
+  const openBooking = () => {
+    setMenuOpen(false);
+    setBookingOpen(true);
+  };
 
   return (
     <div className="clinic-site">
-      <div className="top-notice">
-        <span><CircleCheck size={13}/> Same-day emergency appointments available</span>
-        <a href="tel:+2135550100"><Phone size={13}/> +213 555 0100</a>
-      </div>
-      <header className="site-header">
-        <Link href="/" className="site-logo" aria-label="Lumière Dental Atelier home"><Logo/></Link>
-        <nav className={menuOpen ? "open" : ""}>
-          {navItems.map(([label, href]) => <Link onClick={() => setMenuOpen(false)} href={href} key={href}>{label}</Link>)}
-          <Link onClick={() => setMenuOpen(false)} href="/patient-portal">Patient portal</Link>
-        </nav>
-        <div className="header-actions">
-          <Link href="/patient-portal" className="portal-link"><UserRound size={15}/> Portal</Link>
-          <button className="button primary header-book" onClick={() => setBookingOpen(true)}>Book appointment <ArrowRight size={16}/></button>
-          <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation">{menuOpen ? <X/> : <Menu/>}</button>
+      <div className="site-chrome" inert={menuOpen ? true : undefined} aria-hidden={menuOpen ? true : undefined}>
+        <div className="top-notice">
+          <span><CircleCheck size={13}/> Same-day emergency appointments available</span>
+          <a href="tel:+2135550100"><Phone size={13}/> +213 555 0100</a>
         </div>
-      </header>
+        <header className="site-header">
+          <Link href="/" className="site-logo" aria-label="Lumière Dental Atelier home"><Logo/></Link>
+          <nav className="desktop-nav" aria-label="Primary navigation">
+            {navItems.map(([label, href]) => <Link aria-current={isCurrentPage(href) ? "page" : undefined} href={href} key={href}>{label}</Link>)}
+            <Link aria-current={pageKey === "patient-portal" ? "page" : undefined} href="/patient-portal">Patient portal</Link>
+          </nav>
+          <div className="header-actions">
+            <Link href="/patient-portal" className="portal-link"><UserRound size={15}/> Portal</Link>
+            <button className="button primary header-book" onClick={openBooking}>Book appointment <ArrowRight size={16}/></button>
+            <button
+              ref={menuTriggerRef}
+              className="menu-button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open navigation menu"
+              aria-expanded={menuOpen}
+              aria-controls="mobile-site-menu"
+            >
+              <Menu aria-hidden="true"/>
+            </button>
+          </div>
+        </header>
 
-      {pageKey === "home" ? <Home onBook={() => setBookingOpen(true)}/> : <InnerPage pageKey={pageKey} onBook={() => setBookingOpen(true)}/>}
+        {pageKey === "home" ? <Home onBook={openBooking}/> : <InnerPage pageKey={pageKey} onBook={openBooking}/>}
 
-      <Footer onBook={() => setBookingOpen(true)}/>
-      <a className="whatsapp-float" href="https://wa.me/2135550100" aria-label="Chat with Lumière on WhatsApp"><MessageCircle size={20}/><span>Chat with us</span></a>
-      <div className="mobile-actions">
-        <a href="tel:+2135550100"><Phone size={18}/><span>Call</span></a>
-        <button onClick={() => setBookingOpen(true)}><CalendarDays size={18}/><span>Book appointment</span></button>
-        <a href="https://wa.me/2135550100"><MessageCircle size={18}/><span>WhatsApp</span></a>
+        <Footer onBook={openBooking}/>
+        <a className="whatsapp-float" href="https://wa.me/2135550100" aria-label="Chat with Lumière on WhatsApp"><MessageCircle size={20}/><span>Chat with us</span></a>
+        <nav className="mobile-actions" aria-label="Quick actions">
+          <a href="tel:+2135550100" aria-label="Call Lumière Dental"><Phone size={18}/><span>Call</span></a>
+          <button onClick={openBooking} aria-label="Book an appointment"><CalendarDays size={18}/><span>Book</span></button>
+          <a href="https://wa.me/2135550100" aria-label="Chat with Lumière on WhatsApp"><MessageCircle size={18}/><span>WhatsApp</span></a>
+        </nav>
       </div>
+
+      {menuOpen && (
+        <div
+          id="mobile-site-menu"
+          ref={menuDialogRef}
+          className="mobile-menu-layer"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-menu-title"
+          tabIndex={-1}
+        >
+          <div className="mobile-menu-header">
+            <Link href="/" onClick={() => setMenuOpen(false)} className="site-logo" aria-label="Lumière Dental Atelier home"><Logo/></Link>
+            <button data-menu-close className="mobile-menu-close" onClick={() => setMenuOpen(false)} aria-label="Close navigation menu"><X aria-hidden="true"/></button>
+          </div>
+          <div className="mobile-menu-scroll">
+            <div className="mobile-menu-content">
+              <p id="mobile-menu-title" className="mobile-menu-kicker">Explore Lumière</p>
+              <nav className="mobile-menu-nav" aria-label="Mobile navigation">
+                {mobileNavItems.map(([label, href], index) => (
+                  <Link
+                    href={href}
+                    key={href}
+                    onClick={() => setMenuOpen(false)}
+                    aria-current={isCurrentPage(href) ? "page" : undefined}
+                  >
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{label}</strong>
+                    <ArrowRight aria-hidden="true"/>
+                  </Link>
+                ))}
+              </nav>
+              <div className="mobile-menu-patient-actions">
+                <Link href="/patient-portal" onClick={() => setMenuOpen(false)} aria-current={pageKey === "patient-portal" ? "page" : undefined}>
+                  <UserRound aria-hidden="true"/>
+                  <span><small>PRIVATE ACCESS</small><strong>Patient portal</strong></span>
+                  <ChevronRight aria-hidden="true"/>
+                </Link>
+                <button className="button primary large" onClick={openBooking}>Book appointment <ArrowRight aria-hidden="true"/></button>
+              </div>
+              <div className="mobile-menu-footer">
+                <span><small>CARE TEAM</small><strong>Questions before booking?</strong></span>
+                <a href="tel:+2135550100"><Phone aria-hidden="true"/> +213 555 0100</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {bookingOpen && <BookingModal onClose={() => setBookingOpen(false)}/>}
     </div>
   );
