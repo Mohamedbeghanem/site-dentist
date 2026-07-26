@@ -71,6 +71,23 @@ test("includes local SEO, structured data, and social preview metadata", async (
   assert.match(html, /dentist Algiers/);
 });
 
+test("keeps the smile comparison in full color without breaking the slider", async () => {
+  const [component, styles] = await Promise.all([
+    readFile(new URL("../app/ClinicSite.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(component, /className="smile-before media-treatment"/);
+  assert.match(component, /className="smile-after media-treatment"/);
+  assert.doesNotMatch(component, /smile-(?:before|after) media-treatment media-treatment-clinical/);
+  assert.match(component, /clipPath: `inset\(0 \$\{100 - position\}% 0 0\)`/);
+  assert.match(component, /aria-label="Before and after comparison"/);
+  assert.match(styles, /--media-image:\s*url\("\/images\/smile-before\.webp"\)/);
+  assert.match(styles, /--media-image:\s*url\("\/images\/smile-after\.webp"\)/);
+  assert.match(styles, /\.smile-before::before,\.smile-after::before\s*\{\s*filter:\s*none;/);
+  assert.match(styles, /\.smile-before::after,\.smile-after::after\s*\{\s*background:\s*transparent;/);
+});
+
 test("removes the disposable starter experience", async () => {
   const [page, layout, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),

@@ -325,6 +325,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .smile-before,.smile-after { --media-position: center 52%; position: absolute; inset: 0; }
 .smile-before { --media-image: url("/images/smile-before.webp"); }
 .smile-after { --media-image: url("/images/smile-after.webp"); }
+.smile-before::before,.smile-after::before { filter: none; }
+.smile-before::after,.smile-after::after { background: transparent; }
 .smile-before > span,.smile-after > span { position: absolute; top: 22px; padding: 7px 9px; border-radius: 6px; background: rgba(30,28,25,.66); color: #fff; font-size: 7px; letter-spacing: .1em; }
 .smile-before > span { left: 22px; }
 .smile-after > span { right: 22px; }

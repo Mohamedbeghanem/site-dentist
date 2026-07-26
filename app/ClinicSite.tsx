@@ -880,8 +880,8 @@ function GallerySection({ expanded = false }: { expanded?: boolean }) {
       </div>
       {expanded && <div className="gallery-filters">{filters.map((item) => <button className={filter === item ? "active" : ""} onClick={() => setFilter(item)} key={item}>{item}</button>)}</div>}
       <div className="comparison-card">
-        <div className="smile-before media-treatment media-treatment-clinical"><span>BEFORE</span></div>
-        <div className="smile-after media-treatment media-treatment-clinical" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}><span>AFTER</span></div>
+        <div className="smile-before media-treatment"><span>BEFORE</span></div>
+        <div className="smile-after media-treatment" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}><span>AFTER</span></div>
         <input aria-label="Before and after comparison" type="range" min="8" max="92" value={position} onChange={(event) => setPosition(Number(event.target.value))}/>
         <div className="comparison-handle" style={{ left: `${position}%` }}><ArrowLeft size={14}/><ArrowRight size={14}/></div>
         <div className="comparison-caption"><small>{filter === "All" ? "WHITENING + ALIGNMENT" : filter.toUpperCase()}</small><b>Confidence, without looking “done”.</b><span>Representative visualization · Individual results vary</span></div>
