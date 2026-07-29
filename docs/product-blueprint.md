@@ -1,8 +1,8 @@
-# Lumière Dental Atelier — Product Blueprint
+# EvoDentist — Product Blueprint
 
 ## 1. Brand and conversion strategy
 
-Lumière is positioned as a premium, calm, technology-forward dental clinic.
+EvoDentist is positioned as a premium, calm, technology-forward dental clinic.
 The brand promise is “exceptional clinical standards without the usual
 clinical anxiety.” The primary conversion is an appointment booking. Secondary
 conversions are an emergency call, WhatsApp conversation, portal sign-in,

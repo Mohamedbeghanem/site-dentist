@@ -23,7 +23,7 @@ test("server-renders the premium clinic homepage", async () => {
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
-  assert.match(html, /Lumière Dental Atelier/);
+  assert.match(html, /EvoDentist/);
   assert.match(html, /Your smile deserves/);
   assert.match(html, /Book appointment/);
   assert.match(html, /Complete care, one place/i);
@@ -40,7 +40,7 @@ test("renders every patient-facing route", async () => {
     const response = await render(route);
     assert.equal(response.status, 200, route);
     const html = await response.text();
-    assert.match(html, /Lumière/);
+    assert.match(html, /EvoDentist/);
     assert.match(html, /Book appointment/);
   }
 });
@@ -97,7 +97,7 @@ test("removes the disposable starter experience", async () => {
   assert.doesNotMatch(page, /SkeletonPreview|codex-preview/);
   assert.doesNotMatch(layout, /Starter Project|codex-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
-  assert.match(packageJson, /lumiere-dental-atelier/);
+  assert.match(packageJson, /evodentist/);
 });
 
 test("ships an accessible, viewport-safe mobile navigation system", async () => {

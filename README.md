@@ -1,4 +1,4 @@
-# Lumière Dental Atelier
+# EvoDentist
 
 A premium, conversion-focused dental clinic website built with the EvoDesign
 language. The experience combines luxury healthcare branding, complete

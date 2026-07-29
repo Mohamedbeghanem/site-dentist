@@ -149,7 +149,7 @@ const testimonials = [
 
 const pageCopy: Record<Exclude<PageKey, "home">, { eyebrow: string; title: string; accent: string; text: string }> = {
   about: {
-    eyebrow: "THE LUMIÈRE STANDARD",
+    eyebrow: "THE EVODENTIST STANDARD",
     title: "Dentistry designed around",
     accent: "how you want to feel.",
     text: "A modern clinic where advanced care, thoughtful hospitality, and quiet confidence belong together.",
@@ -203,7 +203,7 @@ const pageCopy: Record<Exclude<PageKey, "home">, { eyebrow: string; title: strin
     text: "Our team helps you understand benefits, estimate coverage, and choose a payment approach that feels comfortable.",
   },
   blog: {
-    eyebrow: "THE LUMIÈRE JOURNAL",
+    eyebrow: "THE EVODENTIST JOURNAL",
     title: "Clear guidance for",
     accent: "better oral health.",
     text: "Thoughtful, clinician-reviewed answers to the questions patients ask us every day.",
@@ -215,7 +215,7 @@ const pageCopy: Record<Exclude<PageKey, "home">, { eyebrow: string; title: strin
     text: "Simple answers about appointments, comfort, payment, insurance, emergencies, and what to expect.",
   },
   contact: {
-    eyebrow: "CONTACT LUMIÈRE",
+    eyebrow: "CONTACT EVODENTIST",
     title: "We’re here",
     accent: "when you’re ready.",
     text: "Ask a question, share a concern, or let our care team help you choose the right next step.",
@@ -237,8 +237,8 @@ const pageCopy: Record<Exclude<PageKey, "home">, { eyebrow: string; title: strin
 function Logo() {
   return (
     <span className="logo-lockup">
-      <span className="logo-mark"><i/><i/></span>
-      <span><strong>Lumière</strong><small>DENTAL ATELIER</small></span>
+      <span className="logo-mark"><span className="logo-monogram" aria-hidden="true">ED</span></span>
+      <span><b>EVO</b><strong>DENTIST</strong></span>
     </span>
   );
 }
@@ -359,6 +359,42 @@ export default function ClinicSite({ pageKey }: { pageKey: PageKey }) {
     return () => desktopQuery.removeEventListener("change", closeMenuAtDesktopWidth);
   }, []);
 
+  useEffect(() => {
+    const page = document.querySelector<HTMLElement>(".site-chrome main");
+    if (!page) return;
+
+    const targets = Array.from(page.querySelectorAll<HTMLElement>([
+      ":scope > section:not(.home-hero)",
+      "section:not(.home-hero) article",
+      "section:not(.home-hero) .section-heading",
+      "section:not(.home-hero) .comparison-card",
+      "section:not(.home-hero) .tech-list > *",
+      "section:not(.home-hero) .visit-timeline > *",
+      "section:not(.home-hero) .care-journey > *",
+    ].join(",")));
+
+    targets.forEach((target, index) => {
+      target.classList.add("scroll-reveal");
+      target.style.setProperty("--reveal-delay", `${(index % 4) * 70}ms`);
+    });
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      targets.forEach((target) => target.classList.add("is-visible"));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+
+    targets.forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, [pageKey]);
+
   const openBooking = () => {
     setMenuOpen(false);
     setBookingOpen(true);
@@ -367,12 +403,8 @@ export default function ClinicSite({ pageKey }: { pageKey: PageKey }) {
   return (
     <div className="clinic-site">
       <div className="site-chrome" inert={menuOpen ? true : undefined} aria-hidden={menuOpen ? true : undefined}>
-        <div className="top-notice">
-          <span><CircleCheck size={13}/> Same-day emergency appointments available</span>
-          <a href="tel:+2135550100"><Phone size={13}/> +213 555 0100</a>
-        </div>
-        <header className="site-header">
-          <Link href="/" className="site-logo" aria-label="Lumière Dental Atelier home"><Logo/></Link>
+        <header className={`site-header ${pageKey === "home" ? "transparent-header" : ""}`}>
+          <Link href="/" className="site-logo" aria-label="EvoDentist home"><Logo/></Link>
           <nav className="desktop-nav" aria-label="Primary navigation">
             {navItems.map(([label, href]) => <Link aria-current={isCurrentPage(href) ? "page" : undefined} href={href} key={href}>{label}</Link>)}
             <Link aria-current={pageKey === "patient-portal" ? "page" : undefined} href="/patient-portal">Patient portal</Link>
@@ -396,11 +428,11 @@ export default function ClinicSite({ pageKey }: { pageKey: PageKey }) {
         {pageKey === "home" ? <Home onBook={openBooking}/> : <InnerPage pageKey={pageKey} onBook={openBooking}/>}
 
         <Footer onBook={openBooking}/>
-        <a className="whatsapp-float" href="https://wa.me/2135550100" aria-label="Chat with Lumière on WhatsApp"><MessageCircle size={20}/><span>Chat with us</span></a>
+        <a className="whatsapp-float" href="https://wa.me/2135550100" aria-label="Chat with EvoDentist on WhatsApp"><MessageCircle size={20}/><span>Chat with us</span></a>
         <nav className="mobile-actions" aria-label="Quick actions">
-          <a href="tel:+2135550100" aria-label="Call Lumière Dental"><Phone size={18}/><span>Call</span></a>
+          <a href="tel:+2135550100" aria-label="Call EvoDentist"><Phone size={18}/><span>Call</span></a>
           <button onClick={openBooking} aria-label="Book an appointment"><CalendarDays size={18}/><span>Book</span></button>
-          <a href="https://wa.me/2135550100" aria-label="Chat with Lumière on WhatsApp"><MessageCircle size={18}/><span>WhatsApp</span></a>
+          <a href="https://wa.me/2135550100" aria-label="Chat with EvoDentist on WhatsApp"><MessageCircle size={18}/><span>WhatsApp</span></a>
         </nav>
       </div>
 
@@ -415,12 +447,12 @@ export default function ClinicSite({ pageKey }: { pageKey: PageKey }) {
           tabIndex={-1}
         >
           <div className="mobile-menu-header">
-            <Link href="/" onClick={() => setMenuOpen(false)} className="site-logo" aria-label="Lumière Dental Atelier home"><Logo/></Link>
+            <Link href="/" onClick={() => setMenuOpen(false)} className="site-logo" aria-label="EvoDentist home"><Logo/></Link>
             <button data-menu-close className="mobile-menu-close" onClick={() => setMenuOpen(false)} aria-label="Close navigation menu"><X aria-hidden="true"/></button>
           </div>
           <div className="mobile-menu-scroll">
             <div className="mobile-menu-content">
-              <p id="mobile-menu-title" className="mobile-menu-kicker">Explore Lumière</p>
+              <p id="mobile-menu-title" className="mobile-menu-kicker">Explore EvoDentist</p>
               <nav className="mobile-menu-nav" aria-label="Mobile navigation">
                 {mobileNavItems.map(([label, href], index) => (
                   <Link
@@ -464,7 +496,7 @@ function Home({ onBook }: { onBook: () => void }) {
         <div className="hero-shade"/>
         <div className="hero-content reveal">
           <span className="eyebrow light"><i/> MODERN DENTISTRY · HUMAN CARE</span>
-          <h1>Your smile deserves<br/><em>exceptional care.</em></h1>
+          <h1>Your smile merits<br/><em>exceptional care.</em></h1>
           <p>Advanced dentistry, considered comfort, and a team who takes the time to truly understand you.</p>
           <div className="hero-buttons">
             <button className="button primary large" onClick={onBook}>Book appointment <ArrowRight size={18}/></button>
@@ -492,11 +524,11 @@ function Home({ onBook }: { onBook: () => void }) {
 
       <section className="intro-section section-shell">
         <div className="section-copy">
-          <span className="eyebrow"><i/> THE LUMIÈRE DIFFERENCE</span>
+          <span className="eyebrow"><i/> THE EVODENTIST DIFFERENCE</span>
           <h2>Dentistry can feel<br/><em>remarkably different.</em></h2>
         </div>
         <div className="intro-copy">
-          <p>We created Lumière for people who expect more from healthcare: more clarity, more comfort, more time, and outcomes that feel completely natural.</p>
+          <p>We created EvoDentist for people who expect more from healthcare: more clarity, more comfort, more time, and outcomes that feel completely natural.</p>
           <Link href="/about" className="text-link">Discover our philosophy <ArrowRight size={16}/></Link>
         </div>
       </section>
@@ -933,7 +965,7 @@ function AboutContent() {
     <>
       <section className="story-section section-shell">
         <div><span className="eyebrow"><i/> OUR STORY</span><h2>Built on a simple idea:<br/><em>clinical excellence should feel human.</em></h2></div>
-        <div><p className="lead">Lumière was founded in 2008 by clinicians who believed that modern dentistry could be both technically exceptional and deeply reassuring.</p><p>Today, our multidisciplinary team combines specialist knowledge, digital planning, and a hospitality-led experience. We give appointments the time they deserve, explain every option clearly, and design care around the person—not just the tooth.</p></div>
+        <div><p className="lead">EvoDentist was founded in 2008 by clinicians who believed that modern dentistry could be both technically exceptional and deeply reassuring.</p><p>Today, our multidisciplinary team combines specialist knowledge, digital planning, and a hospitality-led experience. We give appointments the time they deserve, explain every option clearly, and design care around the person—not just the tooth.</p></div>
       </section>
       <ValuesBand/>
       <section className="manifesto section-shell"><span>Our promise</span><blockquote>“You will never feel rushed, judged, or left without a clear answer.”</blockquote><p>That promise shapes our clinic, our team, and every conversation.</p></section>
@@ -1067,9 +1099,9 @@ function ContactContent() {
         <span className="eyebrow"><i/> VISIT OR CONTACT US</span><h2>We’d love to<br/><em>welcome you.</em></h2>
         <div><MapPin/><span><b>14 Avenue des Oliviers</b><small>Hydra, Algiers · Private parking available</small></span></div>
         <div><Phone/><span><b>+213 555 0100</b><small>Emergency and appointment line</small></span></div>
-        <div><Mail/><span><b>care@lumieredental.com</b><small>Replies within one business day</small></span></div>
+        <div><Mail/><span><b>care@evodentist.com</b><small>Replies within one business day</small></span></div>
         <div><Clock3/><span><b>Monday–Saturday</b><small>8:00 AM–7:00 PM · Friday by appointment</small></span></div>
-        <div className="map-card"><MapPin/><span>LUMIÈRE</span><i/><button>Open in Google Maps <ArrowRight/></button></div>
+        <div className="map-card"><MapPin/><span>EVODENTIST</span><i/><button>Open in Google Maps <ArrowRight/></button></div>
       </div>
       <form className="contact-form" onSubmit={(event) => { event.preventDefault(); setSent(true); }}>
         {sent ? <div className="form-success"><CircleCheck/><h3>Thank you. We’ll be in touch shortly.</h3><p>A care coordinator will contact you within one business day.</p><button type="button" className="button subtle" onClick={() => setSent(false)}>Send another message</button></div> : <><small>CONTACT THE CARE TEAM</small><h3>How can we help?</h3><label>Full name<input required placeholder="Your name"/></label><label>Email address<input required type="email" placeholder="you@email.com"/></label><label>Phone number<input placeholder="+213"/></label><label>What would you like help with?<select defaultValue=""><option value="" disabled>Select a topic</option><option>New patient appointment</option><option>Emergency care</option><option>Treatment question</option><option>Insurance or payment</option></select></label><label>Message<textarea placeholder="Tell us anything that would help us care for you…"/></label><button className="button primary" type="submit">Send message <ArrowRight/></button><p><ShieldCheck/> Your information is private and encrypted.</p></>}
@@ -1085,8 +1117,8 @@ function PortalContent() {
       <section className="portal-content section-shell">
         <form onSubmit={(event) => { event.preventDefault(); setLoggedIn(true); }}>
           <span className="portal-icon"><ShieldCheck/></span><small>SECURE PATIENT ACCESS</small><h2>Welcome back.</h2><p>Use your clinic email and password to continue.</p>
-          <label>Email address<input required type="email" defaultValue="patient@lumiere.demo"/></label>
-          <label>Password<input required type="password" defaultValue="Lumiere2026!"/></label>
+          <label>Email address<input required type="email" defaultValue="patient@evodentist.demo"/></label>
+          <label>Password<input required type="password" defaultValue="EvoDentist2026!"/></label>
           <button className="button primary" type="submit">Sign in securely <ArrowRight/></button>
           <button type="button" className="forgot-link">Forgot your password?</button>
           <div><ShieldCheck/> 256-bit encrypted · Private · Audit protected</div>
@@ -1164,10 +1196,10 @@ function Footer({ onBook }: { onBook: () => void }) {
         <div className="footer-brand"><Link href="/"><Logo/></Link><p>Modern dentistry, thoughtful hospitality, and care that feels entirely personal.</p><Rating compact/><div><a href="#" aria-label="Social updates"><Sparkles/></a><a href="#" aria-label="Community messages"><MessageCircle/></a></div></div>
         <div className="footer-links"><b>Explore</b>{allLinks.slice(1, 7).map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}</div>
         <div className="footer-links"><b>Patient care</b>{allLinks.slice(7).map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}<Link href="/patient-portal">Patient portal</Link></div>
-        <div className="footer-contact"><b>Visit Lumière</b><p><MapPin/>14 Avenue des Oliviers<br/>Hydra, Algiers</p><p><Clock3/>Mon–Sat · 8:00 AM–7:00 PM</p><a href="tel:+2135550100"><Phone/>+213 555 0100</a><button className="button primary" onClick={onBook}>Book appointment</button></div>
+        <div className="footer-contact"><b>Visit EvoDentist</b><p><MapPin/>14 Avenue des Oliviers<br/>Hydra, Algiers</p><p><Clock3/>Mon–Sat · 8:00 AM–7:00 PM</p><a href="tel:+2135550100"><Phone/>+213 555 0100</a><button className="button primary" onClick={onBook}>Book appointment</button></div>
       </div>
       <div className="newsletter section-shell"><div><Mail/><span><b>A healthier smile, delivered thoughtfully.</b><small>Monthly guidance from our clinical team. No noise.</small></span></div><form onSubmit={(event) => event.preventDefault()}><input type="email" aria-label="Newsletter email" placeholder="Your email address"/><button aria-label="Join newsletter"><ArrowRight/></button></form></div>
-      <div className="footer-bottom section-shell"><span>© 2026 Lumière Dental Atelier</span><span><a href="#">Privacy</a><a href="#">Accessibility</a><a href="#">Terms</a></span><span><i/> Accepting new patients</span></div>
+      <div className="footer-bottom section-shell"><span>© 2026 EvoDentist</span><span><a href="#">Privacy</a><a href="#">Accessibility</a><a href="#">Terms</a></span><span><i/> Accepting new patients</span></div>
     </footer>
   );
 }

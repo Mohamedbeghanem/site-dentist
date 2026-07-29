@@ -6,26 +6,26 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lumiere-dental.example"),
+  metadataBase: new URL("https://evodentist.example"),
   title: {
-    default: "Lumière Dental Atelier | Exceptional Modern Dentistry",
-    template: "%s | Lumière Dental Atelier",
+    default: "EvoDentist | Exceptional Modern Dentistry",
+    template: "%s | EvoDentist",
   },
   description: "Modern dentistry powered by experience and technology. Book premium, comfort-first dental care in Algiers.",
   keywords: ["dentist Algiers", "dental clinic Hydra", "dental implants", "Invisalign", "cosmetic dentist", "emergency dentist"],
-  authors: [{ name: "Lumière Dental Atelier" }],
-  creator: "Lumière Dental Atelier",
+  authors: [{ name: "EvoDentist" }],
+  creator: "EvoDentist",
   openGraph: {
     type: "website",
     locale: "en_DZ",
-    siteName: "Lumière Dental Atelier",
+    siteName: "EvoDentist",
     title: "Your Smile Deserves Exceptional Care.",
     description: "Advanced dentistry, considered comfort, and a team who takes the time to understand you.",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Lumière Dental Atelier — Your smile deserves exceptional care." }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "EvoDentist — Your smile deserves exceptional care." }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lumière Dental Atelier",
+    title: "EvoDentist",
     description: "Exceptional modern dentistry in Algiers.",
     images: ["/og.png"],
   },
@@ -43,12 +43,12 @@ export const viewport: Viewport = {
 const dentalSchema = {
   "@context": "https://schema.org",
   "@type": "Dentist",
-  name: "Lumière Dental Atelier",
+  name: "EvoDentist",
   description: "Premium, comfort-first dental clinic providing complete modern dentistry in Algiers.",
-  url: "https://lumiere-dental.example",
+  url: "https://evodentist.example",
   telephone: "+2135550100",
-  email: "care@lumieredental.com",
-  image: "https://lumiere-dental.example/images/clinic-hero-brand.webp",
+  email: "care@evodentist.com",
+  image: "https://evodentist.example/images/clinic-hero-brand.webp",
   priceRange: "$$",
   address: {
     "@type": "PostalAddress",
